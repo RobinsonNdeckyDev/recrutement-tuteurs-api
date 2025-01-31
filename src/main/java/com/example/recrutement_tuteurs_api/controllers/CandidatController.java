@@ -5,6 +5,7 @@ import com.example.recrutement_tuteurs_api.services.CandidatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +17,7 @@ public class CandidatController {
     public CandidatController(CandidatService candidatService) {
         this.candidatService = candidatService;
     }
+
 
 
     @PostMapping
@@ -35,6 +37,8 @@ public class CandidatController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Seuls les utilisateurs ayant le rôle 'ADMIN' peuvent créer une annonce
+    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @PutMapping("/{id}")
     public ResponseEntity<Candidat> updateCandidat(@PathVariable Long id, @RequestBody Candidat updatedCandidat) {
         if (candidatService.getCandidatById(id).isEmpty()) {
@@ -44,6 +48,8 @@ public class CandidatController {
         return new ResponseEntity<>(candidatService.updateCandidat(id, updatedCandidat), HttpStatus.OK);
     }
 
+    // Seuls les utilisateurs ayant le rôle 'ADMIN' peuvent supprimer une annonce
+    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCandidat(@PathVariable Long id) {
         if (candidatService.getCandidatById(id).isEmpty()) {

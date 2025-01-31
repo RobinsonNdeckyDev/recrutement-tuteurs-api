@@ -32,25 +32,22 @@ public class SecurityConfig {
                     // Routes accessibles uniquement par l'admin
                     .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                    // Routes accessibles uniquement par le candidat
-                    .requestMatchers("/api/candidat/**").hasRole("CANDIDAT")
-
                     // Routes accessibles par les deux rôles
                     .requestMatchers("/api/common/**").hasAnyRole("ADMIN", "CANDIDAT")
 
                     // Routes avec des permissions spécifiques (lecture, modification, suppression)
 
                     // Lecture
-                    //.requestMatchers(HttpMethod.GET, "/api/resources/**").hasAnyRole("ADMIN", "CANDIDAT")
+                    .requestMatchers(HttpMethod.GET, "/api/resources/**").hasAnyRole("ADMIN", "CANDIDAT")
 
                     // Création
-                   // .requestMatchers(HttpMethod.POST, "/api/resources/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/api/resources/**").hasRole("ADMIN")
 
                     // Modification
-                    //.requestMatchers(HttpMethod.PUT, "/api/resources/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/resources/**").hasRole("ADMIN")
 
                     // Suppression
-                    //.requestMatchers(HttpMethod.DELETE, "/api/resources/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/resources/**").hasRole("ADMIN")
 
                     .anyRequest().authenticated()
             )
