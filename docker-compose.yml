@@ -1,0 +1,45 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: my-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root123 # Mot de passe de l'utilisateur root
+      MYSQL_DATABASE: recrutement_tuteurs # Nom de la base de données
+    ports:
+      - "3308:3306" # Port d'écoute du conteneur MySQL (3306) et port d'écoute de l'hôte (3308)
+    volumes:
+      - mysql_data:/var/lib/mysql # Stockage des données de la base de données MySQL
+    networks:
+      - spring-boot-mysql-network # Réseau personnalisé pour la communication entre les conteneurs MySQL et Spring Boot App
+
+  app:
+    build: . # Construction de l'image Docker à partir du Dockerfile
+    container_name: my-springboot-app
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker  # Activation du profil Docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/recrutement_tuteurs?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: votre_email@gmail.com
+      SPRING_MAIL_PASSWORD: votre_mot_de_passe
+    depends_on:
+      - mysql # Dépendance de l'application Spring Boot au conteneur MySQL
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - spring-boot-mysql-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  spring-boot-mysql-network:
+    driver: bridge
