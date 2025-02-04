@@ -17,6 +17,7 @@ public class OpenApiConfig {
                         .title("API de gestion de recrutement")
                         .version("1.0")
                         .description("Documentation de l'API de gestion de recrutement"))
+
                 .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("BearerAuth", new SecurityScheme()

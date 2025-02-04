@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
 public class User {
@@ -19,40 +20,15 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING) // Indique à JPA de stocker le rôle sous forme de chaîne
-    private Role role; // Utilisation de l'enum Role
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    private String prenom;
+    private String nom;
+    private String telephone;
+    private String adresse;
+    private String photoProfil;
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
+    // ...
 }

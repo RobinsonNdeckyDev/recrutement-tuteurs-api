@@ -21,7 +21,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final CandidatRepository candidatRepository;
-    private final PasswordEncoder passwordEncoder; // Pour encoder le mot de passe
+    private final PasswordEncoder passwordEncoder;
 
     public AuthenticationService(
             AuthenticationManager authenticationManager,
@@ -31,7 +31,7 @@ public class AuthenticationService {
             AdminRepository adminRepository,
             CandidatRepository candidatRepository,
             PasswordEncoder passwordEncoder
-            ) {
+    ) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
@@ -45,29 +45,71 @@ public class AuthenticationService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
+
         final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
         final String jwt = jwtUtil.generateToken(userDetails);
-        return new AuthenticationResponse(jwt);
+
+        // Récupérer l'utilisateur connecté
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // Vérifier si l'utilisateur est un Admin
+        Admin admin = adminRepository.findByEmail(user.getEmail()).orElse(null);
+        if (admin != null) {
+            AuthenticationResponse.UserInfo userInfo = new AuthenticationResponse.UserInfo(
+                    admin.getPrenom(),
+                    admin.getNom(),
+                    admin.getEmail(),
+                    user.getRole().name(),
+                    admin.getTelephone(),
+                    admin.getAdresse(),
+                    admin.getPhotoProfil()
+            );
+            return new AuthenticationResponse(jwt, userInfo);
+        }
+
+        // Vérifier si l'utilisateur est un Candidat
+        Candidat candidat = candidatRepository.findByEmail(user.getEmail()).orElse(null);
+        if (candidat != null) {
+            AuthenticationResponse.UserInfo userInfo = new AuthenticationResponse.UserInfo(
+                    candidat.getPrenom(),
+                    candidat.getNom(),
+                    candidat.getEmail(),
+                    user.getRole().name(),
+                    candidat.getTelephone(),
+                    candidat.getAdresse(),
+                    candidat.getPhotoProfil()
+            );
+            return new AuthenticationResponse(jwt, userInfo);
+        }
+
+        // Si aucun Admin ou Candidat n'est trouvé, renvoyer des valeurs par défaut
+        AuthenticationResponse.UserInfo userInfo = new AuthenticationResponse.UserInfo(
+                user.getPrenom(),
+                user.getNom(),
+                user.getEmail(),
+                user.getRole().name(),
+                user.getTelephone(),
+                user.getAdresse(),
+                user.getPhotoProfil()
+        );
+        return new AuthenticationResponse(jwt, userInfo);
     }
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException ("L'utilisateur existe déjà");
+            throw new RuntimeException("L'utilisateur existe déjà");
         }
 
         try {
-            // Encodage du mot de passe
             String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-            // Création de l'utilisateur
             User user = new User();
             user.setEmail(request.getEmail());
             user.setPassword(encodedPassword);
             user.setRole(request.getRole());
             userRepository.save(user);
 
-            // Ajout dans la table correspondante
             if (Role.ADMIN.equals(request.getRole())) {
                 Admin admin = new Admin();
                 admin.setUser(user);
@@ -84,11 +126,19 @@ public class AuthenticationService {
                 candidatRepository.save(candidat);
             }
 
-            // Génération du JWT
             final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             final String jwt = jwtUtil.generateToken(userDetails);
 
-            return new AuthenticationResponse(jwt);
+            AuthenticationResponse.UserInfo userInfo = new AuthenticationResponse.UserInfo(
+                    request.getPrenom(),
+                    request.getNom(),
+                    request.getEmail(),
+                    request.getRole().name(),
+                    request.getTelephone(),
+                    request.getAdresse(),
+                    request.getPhotoProfil()
+            );
+            return new AuthenticationResponse(jwt, userInfo);
         } catch (Exception e) {
             throw new RuntimeException("Erreur lors de l'enregistrement de l'utilisateur: " + e.getMessage());
         }
@@ -107,6 +157,4 @@ public class AuthenticationService {
         candidat.setPhotoProfil(request.getPhotoProfil());
         return candidat;
     }
-
-
 }

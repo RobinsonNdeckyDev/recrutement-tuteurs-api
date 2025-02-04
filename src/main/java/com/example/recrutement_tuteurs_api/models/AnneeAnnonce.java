@@ -1,8 +1,11 @@
 package com.example.recrutement_tuteurs_api.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 
@@ -13,16 +16,23 @@ import java.time.LocalDate;
 public class AnneeAnnonce {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore  // Exclut id_annee des réponses JSON
+    @Schema(hidden = true)  // Cache id_annee dans Swagger
     private Long id_annee;
 
     @Column(nullable = false, unique = true)
     private String annee; // Format attendu : "2024-2025"
 
-    private LocalDate dateCreation = LocalDate.now(); // Date par dÃ©faut lors de l'insertion
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateDebut;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateFin;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateModification;
 
-    // Getters and Setters
+    // Getters et Setters
     public Long getId_annee() {
         return id_annee;
     }
@@ -39,12 +49,20 @@ public class AnneeAnnonce {
         this.annee = annee;
     }
 
-    public LocalDate getDateCreation() {
-        return dateCreation;
+    public LocalDate getDateDebut() {
+        return dateDebut;
     }
 
-    public void setDateCreation(LocalDate dateCreation) {
-        this.dateCreation = dateCreation;
+    public void setDateDebut(LocalDate dateDebut) {
+        this.dateDebut = dateDebut;
+    }
+
+    public LocalDate getDateFin() {
+        return dateFin;
+    }
+
+    public void setDateFin(LocalDate dateFin) {
+        this.dateFin = dateFin;
     }
 
     public LocalDate getDateModification() {

@@ -2,6 +2,7 @@ package com.example.recrutement_tuteurs_api.services;
 
 import com.example.recrutement_tuteurs_api.models.AnneeAnnonce;
 import com.example.recrutement_tuteurs_api.repository.AnneeAnnonceRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,9 +28,15 @@ public class AnneeAnnonceService {
         return anneeAnnonceRepository.findById(id);
     }
 
+    @Transactional
     public AnneeAnnonce updateAnneeAnnonce(Long id, AnneeAnnonce updatedAnneeAnnonce) {
-        updatedAnneeAnnonce.setId_annee(id);
-        return anneeAnnonceRepository.save(updatedAnneeAnnonce);
+        return anneeAnnonceRepository.findById(id).map(existingAnneeAnnonce -> {
+            existingAnneeAnnonce.setAnnee(updatedAnneeAnnonce.getAnnee());
+            existingAnneeAnnonce.setDateDebut(updatedAnneeAnnonce.getDateDebut());
+            existingAnneeAnnonce.setDateFin(updatedAnneeAnnonce.getDateFin());
+            existingAnneeAnnonce.setDateModification(updatedAnneeAnnonce.getDateModification());
+            return anneeAnnonceRepository.save(existingAnneeAnnonce);
+        }).orElseThrow(() -> new RuntimeException("L'année d'annonce avec l'ID " + id + " n'existe pas."));
     }
 
     public void deleteAnneeAnnonceById(Long id) {

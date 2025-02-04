@@ -21,7 +21,7 @@ public class CorsConfig {
 
                 // Configuration des origines autorisées pour les requêtes CORS et les méthodes HTTP autorisées
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("http://localhost:4200")
                         // Remplacez par les méthodes HTTP autorisées
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         // Remplacez par les headers autorisés
