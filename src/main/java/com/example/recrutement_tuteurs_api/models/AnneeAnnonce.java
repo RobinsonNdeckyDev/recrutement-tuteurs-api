@@ -16,8 +16,8 @@ import java.time.LocalDate;
 public class AnneeAnnonce {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore  // Exclut id_annee des réponses JSON
-    @Schema(hidden = true)  // Cache id_annee dans Swagger
+//    @JsonIgnore  // Exclut id_annee des réponses JSON
+//    @Schema(hidden = true)  // Cache id_annee dans Swagger
     private Long id_annee;
 
     @Column(nullable = false, unique = true)
