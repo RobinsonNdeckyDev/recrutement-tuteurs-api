@@ -1,7 +1,5 @@
 package com.example.recrutement_tuteurs_api.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +14,7 @@ import java.time.LocalDate;
 public class AnneeAnnonce {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @JsonIgnore  // Exclut id_annee des réponses JSON
-//    @Schema(hidden = true)  // Cache id_annee dans Swagger
+
     private Long id_annee;
 
     @Column(nullable = false, unique = true)

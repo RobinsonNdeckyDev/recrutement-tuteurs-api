@@ -27,9 +27,7 @@ public class Annonce {
     @Column(nullable = false)
     private String etat = "OUVERTE"; // Par défaut, l'annonce est ouverte
 
-    @ManyToOne
-    @JoinColumn(name = "id_annee", nullable = false)
-    private AnneeAnnonce anneeAcademique;
+    private Long idAnnee;
 
     // Getters and Setters
     public Long getIdAnnonce() {
@@ -72,11 +70,11 @@ public class Annonce {
         this.etat = etat;
     }
 
-    public AnneeAnnonce getAnneeAcademique() {
-        return anneeAcademique;
+    public Long getIdAnnee() {
+        return idAnnee;
     }
 
-    public void setAnneeAcademique(AnneeAnnonce anneeAcademique) {
-        this.anneeAcademique = anneeAcademique;
+    public void setIdAnnee(Long idAnnee) {
+        this.idAnnee = idAnnee;
     }
 }

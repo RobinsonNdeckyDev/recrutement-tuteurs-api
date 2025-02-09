@@ -27,7 +27,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response, @SuppressWarnings("null") FilterChain chain)
             throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
@@ -54,7 +54,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 logger.warn("Token invalide pour l'utilisateur: " + username);
             }
         } else {
-            logger.warn("Aucun token ou nom d'utilisateur dans l'en-tête Authorization");
+            logger.warn("Aucun token ou nom d'utilisateur dans l'en-tï¿½te Authorization");
         }
         chain.doFilter(request, response);
     }
