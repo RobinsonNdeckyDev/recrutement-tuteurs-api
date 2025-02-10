@@ -14,6 +14,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -21,16 +23,26 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final JwtUtil jwtUtil;
 
+    // Liste des routes publiques
+    private static final List<String> PUBLIC_ROUTES = Arrays.asList("/api/auth/register", "/api/auth/login");
+
     public JwtRequestFilter(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
     }
 
     @Override
-    protected void doFilterInternal(@SuppressWarnings("null") HttpServletRequest request, @SuppressWarnings("null") HttpServletResponse response, @SuppressWarnings("null") FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         final String authorizationHeader = request.getHeader("Authorization");
+
+        // Vérifie si la requête est sur une route publique
+        if (isPublicRoute(request.getRequestURI())) {
+            logger.info("Bypass JWT filter for public route: " + request.getRequestURI());
+            chain.doFilter(request, response);  // Ignore ce filtre pour ces routes
+            return;
+        }
 
         String username = null;
         String jwt = null;
@@ -40,8 +52,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             username = jwtUtil.extractUsername(jwt);
         }
 
+        // Si le token est présent et qu'aucune authentification n'est en place
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails)) {
@@ -50,12 +62,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }else {
+            } else {
                 logger.warn("Token invalide pour l'utilisateur: " + username);
             }
         } else {
-            logger.warn("Aucun token ou nom d'utilisateur dans l'en-t�te Authorization");
+            logger.warn("Aucun token ou nom d'utilisateur dans l'en-tête Authorization");
         }
         chain.doFilter(request, response);
+    }
+
+    // Vérifier si la route est publique
+    private boolean isPublicRoute(String uri) {
+        return PUBLIC_ROUTES.stream().anyMatch(uri::startsWith);
     }
 }

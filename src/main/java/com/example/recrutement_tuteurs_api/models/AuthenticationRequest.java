@@ -1,18 +1,9 @@
 package com.example.recrutement_tuteurs_api.models;
 
-import lombok.Getter;
+import lombok.Data;
 
+@Data
 public class AuthenticationRequest {
-    @Getter
     private String email;
     private String password;
-    private String role;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

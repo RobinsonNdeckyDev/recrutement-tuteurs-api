@@ -1,89 +1,35 @@
 package com.example.recrutement_tuteurs_api.models;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class RegisterRequest {
+    @NotNull(message = "L'email est obligatoire.")
+    @NotBlank(message = "L'email ne peut pas être vide.")
     private String email;
+
+    @NotNull(message = "Le mot de passe est obligatoire.")
+    @NotBlank(message = "Le mot de passe ne peut pas être vide.")
     private String password;
+
+    @NotNull(message = "Le prénom est obligatoire.")
+    @NotBlank(message = "Le prénom ne peut pas être vide.")
     private String prenom;
+
+    @NotNull(message = "Le nom est obligatoire.")
+    @NotBlank(message = "Le nom ne peut pas être vide.")
     private String nom;
+
+    @NotNull(message = "L'adresse est obligatoire.")
+    @NotBlank(message = "L'adresse ne peut pas être vide.")
     private String adresse;
+
     private String telephone;
     private String description;
     private String photoProfil;
+
+    @NotNull(message = "Le rôle est obligatoire.")
     private Role role;
-
-    // Si Lombok n'est pas fonctionnel, ajoute manuellement les getters et setters
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPrenom() {
-        return prenom;
-    }
-
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public String getAdresse() {
-        return adresse;
-    }
-
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
-
-    public String getTelephone() {
-        return telephone;
-    }
-
-    public void setTelephone(String telephone) {
-        this.telephone = telephone;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPhotoProfil() {
-        return photoProfil;
-    }
-
-    public void setPhotoProfil(String photoProfil) {
-        this.photoProfil = photoProfil;
-    }
-
-    public Role getRole() {
-        return role; // Assure-toi que ce getter existe
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
 }

@@ -1,60 +1,43 @@
 package com.example.recrutement_tuteurs_api.controllers;
 
-import com.example.recrutement_tuteurs_api.models.Admin;
+import com.example.recrutement_tuteurs_api.dto.AdminDTO;
 import com.example.recrutement_tuteurs_api.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
+
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admins")
 public class AdminController {
+
     private final AdminService adminService;
 
     @Autowired
     public AdminController(AdminService adminService) {
         this.adminService = adminService;
     }
-    
-    // Méthode pour créer un nouvel administrateur
-    // Accessible uniquement aux utilisateurs ayant le rôle 'ADMIN' ou 'CANDIDAT'
-    @PreAuthorize("hasAnyRole('ADMIN', 'CANDIDAT')")
+
+    // Créer un admin
     @PostMapping
-    public ResponseEntity<Admin> createAdmin(@RequestBody Admin admin) {
-        // Retourne une réponse avec le nouvel administrateur créé et le statut HTTP 201 (Created)
-        return new ResponseEntity<>(adminService.createAdmin(admin), HttpStatus.CREATED);
+    public ResponseEntity<AdminDTO> createAdmin(@Valid @RequestBody AdminDTO adminDTO) {
+        AdminDTO createdAdmin = adminService.createAdmin(adminDTO);
+        return ResponseEntity.ok(createdAdmin);
     }
 
-    @GetMapping
-    public ResponseEntity<Iterable<Admin>> getAllAdmins() {
-        return new ResponseEntity<>(adminService.getAllAdmins(), HttpStatus.OK);
-    }
-
+    // Récupérer un admin par son ID
     @GetMapping("/{id}")
-    public ResponseEntity<Admin> getAdminById(@PathVariable Long id) {
+    public ResponseEntity<AdminDTO> getAdminById(@PathVariable Long id) {
         return adminService.getAdminById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Admin> updateAdmin(@PathVariable Long id, @RequestBody Admin updatedAdmin) {
-        if (adminService.getAdminById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        updatedAdmin.setIdAdmin(id);
-        return new ResponseEntity<>(adminService.updateAdmin(id, updatedAdmin), HttpStatus.OK);
-    }
-
-
+    // Supprimer un admin
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteAdmin(@PathVariable Long id) {
-        if (adminService.getAdminById(id).isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        adminService.deleteAdminById(id);
+    public ResponseEntity<Void> deleteAdmin(@PathVariable Long id) {
+        adminService.deleteAdmin(id);
         return ResponseEntity.noContent().build();
     }
 }
